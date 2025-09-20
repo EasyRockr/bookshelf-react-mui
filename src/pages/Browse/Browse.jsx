@@ -43,7 +43,7 @@ export default function Browse() {
     e.preventDefault()
     if (!q.trim()) return
     setStatus('loading')
-    ol.get('/search.json', { params: { q: q.trim(), limit: 24 }})
+    ol.get(`/search.json?q=${encodeURIComponent(q.trim())}&limit=24`)
       .then(res => {
         const list = (res.data.docs || []).slice(0,24).map(normalizeDoc)
         setRows(list)
