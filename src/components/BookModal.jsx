@@ -152,12 +152,10 @@ export default function BookModal({ open, handleClose, book, rating }) {
 
                 <Divider sx={{ my: 2 }} />
 
-                {/* Cleaned Description */}
                 <Typography variant="body1" sx={{ mb: 3 }}>
                   {cleanDescription(details.description)}
                 </Typography>
 
-                {/* Subjects */}
                 {details.subjects && (
                   <>
                     <Typography variant="subtitle1" gutterBottom>
@@ -171,7 +169,6 @@ export default function BookModal({ open, handleClose, book, rating }) {
                   </>
                 )}
 
-                {/* Places */}
                 {details.subject_places && (
                   <>
                     <Typography variant="subtitle1" gutterBottom>
