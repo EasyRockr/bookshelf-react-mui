@@ -26,23 +26,18 @@ export default function Trending() {
     setIsLoading(true)
     setErrorMessage('')
 
-    // Match BASE behavior/order:
-    //   - Trending Now  == subject 'fiction'
-    //   - Popular Fiction == subject 'science'
-    //   - History & Biography == subject 'history' (top up with 'biography' if fewer than 6)
-    const fetchTrendingFromFiction = axios({
-      url: `${OL_ROOT}/search.json`,
+    const fetchTrending = axios({
+      url: `${OL_ROOT}/trending/daily.json`,
       method: 'GET',
-      params: { subject: 'fiction', limit: 12 },
       headers: { Accept: 'application/json' },
       paramsSerializer: (p) => qsSerialize(p),
       signal: ctrl.signal,
-    }).then(r => (r.data?.docs || []).map(normalizeDoc)).catch(() => [])
+    }).then(r => (r.data?.works || []).map(normalizeDoc)).catch(() => [])
 
-    const fetchFictionFromScience = axios({
+    const fetchFiction = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
-      params: { subject: 'science', limit: 12 },
+      params: { subject: 'fiction', limit: 12 },
       headers: { Accept: 'application/json' },
       paramsSerializer: (p) => qsSerialize(p),
       signal: ctrl.signal,
@@ -72,7 +67,7 @@ export default function Trending() {
     })
     .catch(() => [])
 
-    Promise.allSettled([fetchTrendingFromFiction, fetchFictionFromScience, fetchHistBio]).then(([tr, fi, hi]) => {
+    Promise.allSettled([fetchTrending, fetchFiction, fetchHistBio]).then(([tr, fi, hi]) => {
       if (!live) return
       const toList = (res) => res.status === 'fulfilled' ? (res.value || []) : []
       const next = {

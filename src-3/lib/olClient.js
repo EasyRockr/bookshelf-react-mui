@@ -1,11 +1,11 @@
 // src/lib/olClient.js
 import axios from 'axios';
 
-// Absolute public domains
+// Absolute public domains (no dev proxy)
 export const OL_ROOT = 'https://openlibrary.org';
 export const COVERS_ROOT = 'https://covers.openlibrary.org';
 
-/** Keep %20 (not '+') for spaces */
+/** Params serializer that keeps %20 (not '+') for spaces */
 export const qsSerialize = (params = {}) => {
   const parts = [];
   const add = (k, v) => {
@@ -17,15 +17,7 @@ export const qsSerialize = (params = {}) => {
   return parts.join('&');
 };
 
-// Optional axios instance (kept for compatibility with other files)
-export const ol = axios.create({
-  baseURL: OL_ROOT,
-  headers: { Accept: 'application/json' },
-  timeout: 12000,
-  paramsSerializer: (p) => qsSerialize(p || {}),
-});
-
-// ---- Utilities (unchanged API) ------------------------------------
+// Utilities you already rely on (no async exports)
 export const ratingForKey = (key = 'x') =>
   ((Array.from(key).reduce((a, c) => ((a * 33 + c.charCodeAt(0)) >>> 0), 0) % 11) * 0.5);
 
@@ -50,4 +42,5 @@ export const normalizeDoc = (doc = {}) => ({
   genres: Array.isArray(doc.subject) ? doc.subject.slice(0, 3) : [],
 });
 
+// Re-export axios for convenience (optional)
 export { axios };
