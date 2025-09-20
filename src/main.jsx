@@ -1,29 +1,6 @@
-import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#1c1c1c', 
-    },
-    background: {
-      default: '#121212',
-      paper: '#1c1c1c',
-    },
-    text: {
-      primary: '#ffffff',
-    },
-  },
-  typography: {
-    fontFamily: 'Arial, sans-serif',
-  },
-});
-
-createRoot(document.getElementById('root')).render(
-  <ThemeProvider theme={darkTheme}>
-    <CssBaseline /> 
-    <App />
-  </ThemeProvider>
-);
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { CssBaseline } from '@mui/material'
+import App from './App.jsx'
+import ThemeProvider from './app/providers/ThemeProvider.jsx'
+ReactDOM.createRoot(document.getElementById('root')).render(<React.StrictMode><ThemeProvider><CssBaseline /><App /></ThemeProvider></React.StrictMode>)
