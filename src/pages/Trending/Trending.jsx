@@ -26,10 +26,10 @@ export default function Trending() {
     setIsLoading(true)
     setErrorMessage('')
 
-    // Match BASE behavior/order:
-    //   - Trending Now  == subject 'fiction'
-    //   - Popular Fiction == subject 'science'
-    //   - History & Biography == subject 'history' (top up with 'biography' if fewer than 6)
+    // Base ordering:
+    // Trending Now: fiction
+    // Popular Fiction: science
+    // History & Biography: history (+ biography top-up)
     const fetchTrendingFromFiction = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
@@ -59,7 +59,6 @@ export default function Trending() {
     .then(async (r) => {
       const hist = (r.data?.docs || []).map(normalizeDoc)
       if (hist.length >= 6) return hist
-      // fallback: top up with biography
       const bio = await axios({
         url: `${OL_ROOT}/search.json`,
         method: 'GET',

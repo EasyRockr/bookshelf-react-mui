@@ -24,7 +24,7 @@ const PEOPLE = [
     email: "franzrainierc.adriano@citco.com",
     dob: "August 03, 2003",
     gender: "♂︎",
-    cv: "/cv-franz.pdf",
+    cv: "/franz_resume.pdf",
     skills: [
       "HTML","CSS","JavaScript","PHP","C","C++","C#","Java","Python","Salesforce Apex",
       "MySQL","Microsoft SQL Server","Firebase (NoSQL)","SOQL","ReactJS","Laravel PHP",

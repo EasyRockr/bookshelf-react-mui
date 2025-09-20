@@ -26,18 +26,23 @@ export default function Trending() {
     setIsLoading(true)
     setErrorMessage('')
 
-    const fetchTrending = axios({
-      url: `${OL_ROOT}/trending/daily.json`,
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      paramsSerializer: (p) => qsSerialize(p),
-      signal: ctrl.signal,
-    }).then(r => (r.data?.works || []).map(normalizeDoc)).catch(() => [])
-
-    const fetchFiction = axios({
+    // Base ordering:
+    // Trending Now: fiction
+    // Popular Fiction: science
+    // History & Biography: history (+ biography top-up)
+    const fetchTrendingFromFiction = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
       params: { subject: 'fiction', limit: 12 },
+      headers: { Accept: 'application/json' },
+      paramsSerializer: (p) => qsSerialize(p),
+      signal: ctrl.signal,
+    }).then(r => (r.data?.docs || []).map(normalizeDoc)).catch(() => [])
+
+    const fetchFictionFromScience = axios({
+      url: `${OL_ROOT}/search.json`,
+      method: 'GET',
+      params: { subject: 'science', limit: 12 },
       headers: { Accept: 'application/json' },
       paramsSerializer: (p) => qsSerialize(p),
       signal: ctrl.signal,
@@ -54,7 +59,6 @@ export default function Trending() {
     .then(async (r) => {
       const hist = (r.data?.docs || []).map(normalizeDoc)
       if (hist.length >= 6) return hist
-      // fallback: top up with biography
       const bio = await axios({
         url: `${OL_ROOT}/search.json`,
         method: 'GET',
@@ -67,7 +71,7 @@ export default function Trending() {
     })
     .catch(() => [])
 
-    Promise.allSettled([fetchTrending, fetchFiction, fetchHistBio]).then(([tr, fi, hi]) => {
+    Promise.allSettled([fetchTrendingFromFiction, fetchFictionFromScience, fetchHistBio]).then(([tr, fi, hi]) => {
       if (!live) return
       const toList = (res) => res.status === 'fulfilled' ? (res.value || []) : []
       const next = {

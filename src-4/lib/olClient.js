@@ -5,6 +5,9 @@ import axios from 'axios';
 export const OL_ROOT = 'https://openlibrary.org';
 export const COVERS_ROOT = 'https://covers.openlibrary.org';
 
+// Fallback cover (use a reliable host or swap to your own /public asset)
+export const NO_COVER_URL = 'https://placehold.co/300x450?text=No%20Cover';
+
 /** Keep %20 (not '+') for spaces */
 export const qsSerialize = (params = {}) => {
   const parts = [];
@@ -17,11 +20,11 @@ export const qsSerialize = (params = {}) => {
   return parts.join('&');
 };
 
-// Optional axios instance (kept for compatibility with other files)
+// Optional axios instance (kept for compatibility).
+// NOTE: No timeout here (as requested: remove timers that end GETs).
 export const ol = axios.create({
   baseURL: OL_ROOT,
   headers: { Accept: 'application/json' },
-  timeout: 12000,
   paramsSerializer: (p) => qsSerialize(p || {}),
 });
 
@@ -31,9 +34,7 @@ export const ratingForKey = (key = 'x') =>
 
 export const coverUrlFrom = (doc = {}) => {
   const id = doc.cover_i || doc.cover_id || doc.cover;
-  return id
-    ? `${COVERS_ROOT}/b/id/${id}-L.jpg`
-    : `https://via.placeholder.com/300x450?text=No+Cover`;
+  return id ? `${COVERS_ROOT}/b/id/${id}-L.jpg` : NO_COVER_URL;
 };
 
 export const normalizeDoc = (doc = {}) => ({
@@ -50,4 +51,5 @@ export const normalizeDoc = (doc = {}) => ({
   genres: Array.isArray(doc.subject) ? doc.subject.slice(0, 3) : [],
 });
 
+// Re-export axios for convenience
 export { axios };

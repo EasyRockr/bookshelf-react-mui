@@ -17,11 +17,11 @@ export const qsSerialize = (params = {}) => {
   return parts.join('&');
 };
 
-// Optional axios instance (kept for compatibility with other files)
+// Optional axios instance (kept for compatibility).
+// NOTE: No timeout here (user asked to remove timers that end GETs).
 export const ol = axios.create({
   baseURL: OL_ROOT,
   headers: { Accept: 'application/json' },
-  timeout: 12000,
   paramsSerializer: (p) => qsSerialize(p || {}),
 });
 

@@ -57,7 +57,7 @@ export default function Random() {
     const subject = SUBJECTS[idxRef.current % SUBJECTS.length]
     idxRef.current++
 
-    // cancel stale
+    // cancel stale request
     abortRef.current?.abort?.()
     abortRef.current = new AbortController()
 

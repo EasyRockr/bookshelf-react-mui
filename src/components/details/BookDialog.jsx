@@ -6,11 +6,13 @@ import { useTheme } from '@mui/material/styles'
 import axios from 'axios'
 import { OL_ROOT } from '../../lib/olClient.js'
 import { modalWrapSx, leftPaneSx, leftCardSx, leftMediaSx, rightPaneSx, closeBtnSx, metaRowSx } from '../../Styles/bookDialog.sx.js'
-import { divSpace, bodySpace, centerRow, tagRow } from '../../Styles/dialogExtras.sx.js'
+import { divSpace, centerRow, tagRow } from '../../Styles/dialogExtras.sx.js'
 
 const cleanDescription = (desc) => {
   if (!desc) return 'No description available.'
   let text = typeof desc === 'string' ? desc : desc.value || ''
+
+  // Normalize newlines and strip wiki/markdown-ish noise
   text = text.replace(/\r\n|\r|\n/g, ' ').trim()
   text = text.replace(/\[source\][\s\S]*$/gi, ' ').trim()
   text = text.replace(/\[[^\]]+\]\[\d+\]/g, ' ').trim()
@@ -28,6 +30,7 @@ const cleanDescription = (desc) => {
   text = text.replace(/\bAlso\.?$/i, ' ')
   text = text.replace(/^[\s\.\-:,;\/]+|[\s\.\-:,;\/]+$/g, ' ')
   text = text.replace(/\s+/g, ' ').trim()
+
   if (!text || text.replace(/[^\w]/g, '').length < 3) return 'No description available.'
   if (!/[.!?]$/.test(text)) text += '.'
   return text
@@ -37,7 +40,7 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
   const t = useTheme()
   const [loading, setLoading] = useState(false)
   const [details, setDetails] = useState(null)
-  const [showFull, setShowFull] = useState(false);
+  const [showFull, setShowFull] = useState(false)
 
   useEffect(() => {
     if (!open || !book?.key) return
@@ -69,14 +72,14 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
     ? book.rating.toFixed(1)
     : (book?.rating && !Number.isNaN(Number(book.rating)) ? Number(book.rating).toFixed(1) : 'N/A')
 
-  const fullDesc = cleanDescription(details?.description);
-  const limit = 300;
+  const fullDesc = cleanDescription(details?.description)
+  const limit = 300
   const visibleDesc =
     !fullDesc
       ? 'No description available.'
       : showFull || fullDesc.length <= limit
         ? fullDesc
-        : fullDesc.slice(0, limit).trimEnd() + '…';
+        : fullDesc.slice(0, limit).trimEnd() + '…'
 
   return (
     <Modal open={open} onClose={onClose}>

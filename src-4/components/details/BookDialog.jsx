@@ -6,12 +6,14 @@ import { useTheme } from '@mui/material/styles'
 import axios from 'axios'
 import { OL_ROOT } from '../../lib/olClient.js'
 import { modalWrapSx, leftPaneSx, leftCardSx, leftMediaSx, rightPaneSx, closeBtnSx, metaRowSx } from '../../Styles/bookDialog.sx.js'
-import { divSpace, bodySpace, centerRow, tagRow } from '../../Styles/dialogExtras.sx.js'
+import { divSpace, centerRow, tagRow } from '../../Styles/dialogExtras.sx.js'
 
 const cleanDescription = (desc) => {
   if (!desc) return 'No description available.'
   let text = typeof desc === 'string' ? desc : desc.value || ''
-  text = text.replace(/\r\n|\r|\n/g, ' ').trim()
+  text = text.replace(/
+||
+/g, ' ').trim()
   text = text.replace(/\[source\][\s\S]*$/gi, ' ').trim()
   text = text.replace(/\[[^\]]+\]\[\d+\]/g, ' ').trim()
   text = text.replace(/^\s*\[\d+\]:\s*\S+(?:\s+\S+)*$/gim, ' ').trim()
@@ -19,13 +21,13 @@ const cleanDescription = (desc) => {
   text = text.replace(/\[([^\]]+)\]\((?:[^)]+)\)/g, '$1')
   text = text.replace(/https?:\/\/\S+/gi, ' ')
   text = text.replace(/[-=]{3,}/g, ' ')
-  text = text.replace(/\b(?:Contained in:|See also:)[\s\S]*$/gi, '').trim()
-  text = text.replace(/\*+\s*Also\b[:.]?/gi, ' ')
+  text = text.replace(/(?:Contained in:|See also:)[\s\S]*$/gi, '').trim()
+  text = text.replace(/\*+\s*Also[:.]?/gi, ' ')
   text = text.replace(/[*_]{1,}/g, ' ')
   text = text.replace(/\s*\[\d+\]\s*/g, ' ')
   text = text.replace(/\(\s*\)|\[\s*\]|\{\s*\}/g, ' ')
   text = text.replace(/[\(\[\{]\s*$/g, ' ')
-  text = text.replace(/\bAlso\.?$/i, ' ')
+  text = text.replace(/Also\.?$/i, ' ')
   text = text.replace(/^[\s\.\-:,;\/]+|[\s\.\-:,;\/]+$/g, ' ')
   text = text.replace(/\s+/g, ' ').trim()
   if (!text || text.replace(/[^\w]/g, '').length < 3) return 'No description available.'
