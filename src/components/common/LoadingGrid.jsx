@@ -8,7 +8,8 @@ import { gridWrapSx } from '../../Styles/loading.sx.js'
 export default function LoadingGrid({
   count = 12,
   animation = 'pulse',
-  fullCard = false, // set true if you want a single big skeleton the size of the whole card
+  fullCard = false,     // true = single big skeleton the size of the whole card
+  itemProps = {},       // optional: pass { xs, sm, md, lg } if you want breakpoints
 }) {
   const t = useTheme()
   const coverH = IMAGE_H
@@ -17,7 +18,7 @@ export default function LoadingGrid({
   return (
     <Grid container spacing={2} sx={gridWrapSx(t)}>
       {Array.from({ length: count }).map((_, i) => (
-        <Grid item key={i}>
+        <Grid item key={i} {...itemProps}>
           <Box sx={{ width: CARD_W }}>
             <Skeleton
               variant="rectangular"
@@ -25,10 +26,10 @@ export default function LoadingGrid({
               height={fullCard ? cardH : coverH}
               sx={{
                 borderRadius: t.shape.borderRadius,
-                // If we’re only doing the image area, keep bottom corners square like the real card
-                ...(fullCard
-                  ? {}
-                  : { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }),
+                ...(fullCard ? {} : {
+                  borderBottomLeftRadius: 0,
+                  borderBottomRightRadius: 0,
+                }),
               }}
             />
             {!fullCard && (

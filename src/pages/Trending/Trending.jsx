@@ -15,74 +15,81 @@ export default function Trending() {
   const [dialog, setDialog] = useState({ open:false, book:null })
   const [data, setData] = useState({ trending:[], fiction:[], science:[], histbio:[] })
 
+  const open = (b) => setDialog({ open: true, book: b })
+  const close = () => setDialog({ open: false, book: null })
+
   useEffect(() => {
-    let mounted = true
-    ;(async () => {
+    const ctrl = new AbortController()
+    let live = true
+
+    async function load() {
+      setIsLoading(true)
+      setErrorMessage('')
+
+      const opts = { ttlMs: 10*60*1000, staleMs: 24*60*60*1000, signal: ctrl.signal }
+
+      const jobs = [
+        searchBySubject('fiction', 12, opts),
+        searchBySubject('science', 12, opts),
+        searchBySubject('history', 12, opts).then(h => {
+          return h.length >= 6 ? h : searchBySubject('biography', 12, opts).then(b => [...h, ...b].slice(0,12))
+        }),
+      ]
+
       try {
-        const trRes = await Promise.allSettled([
-          olCachedGet('/trending/daily.json', { ttlMs: 5*60*1000 })
-        ])
+        const [tr, fi, hi] = await Promise.allSettled(jobs)
+        const toList = (r) => r.status === 'fulfilled' ? (r.value || []).map(normalizeDoc) : []
 
-        const trending = trRes[0].status === 'fulfilled'
-          ? (trRes[0].value?.data?.works || []).slice(0,12).map(normalizeDoc)
-          : []
+        const next = {
+          trending: toList(tr),
+          fiction:  toList(fi),
+          science:  [], // not used separately in this variant
+          histbio:  toList(hi),
+        }
 
-        const [fic, sci, his, bio] = await Promise.all([
-          searchBySubject('fiction', 6,   { ttlMs: 5*60*1000 }),
-          searchBySubject('science', 6,   { ttlMs: 5*60*1000 }),
-          searchBySubject('history', 3,   { ttlMs: 5*60*1000 }),
-          searchBySubject('biography', 3, { ttlMs: 5*60*1000 }),
-        ])
-
-        if (!mounted) return
-        setData({
-          trending,
-          fiction: (fic || []).map(normalizeDoc),
-          science: (sci || []).map(normalizeDoc),
-          histbio: ([...(his || []), ...(bio || [])]).map(normalizeDoc),
-        })
-      } catch (err) {
-        setErrorMessage(err?.message || 'Failed to load')
-      } finally {
-        if (mounted) setIsLoading(false)
+        if (live) {
+          const total = next.trending.length + next.fiction.length + next.histbio.length
+          if (total === 0) {
+            setErrorMessage('Failed to reach the books service. Showing placeholders.')
+          }
+          setData(next)
+          setIsLoading(false)
+        }
+      } catch (e) {
+        if (live) {
+          setErrorMessage('Failed to reach the books service. Please try again.')
+          setIsLoading(false)
+        }
       }
-    })()
-    return () => { mounted = false }
-  }, [])
+    }
 
-  const open  = (b) => setDialog({ open:true, book:b })
-  const close = () => setDialog({ open:false, book:null })
+    load()
+    return () => { live = false; ctrl.abort() }
+  }, [])
 
   return (
     <Box sx={pageWrapSx(t)}>
-      <Typography variant="h4" sx={pageTitleSx(t)}>Trending Books Today</Typography>
+      <Typography variant="h4" sx={pageTitleSx(t)}>
+        Trending Books Today
+      </Typography>
 
-      {isLoading && (
+      {isLoading && <LoadingGrid count={12} animation="pulse" />}
+
+      {!isLoading && (
         <>
-          <LoadingGrid count={12} />
-          {/* replaced <SimpleLoader full /> with skeleton grid */}
-        </>
-      )}
+          {errorMessage && (
+            <Typography color="warning.main" sx={{ textAlign:'center', mb: 2 }}>{errorMessage}</Typography>
+          )}
 
-      {!isLoading && errorMessage && (
-        <Typography color="error">{errorMessage}</Typography>
-      )}
-
-      {!isLoading && !errorMessage && (
-        <>
-          <Section title="Trending Today" books={data.trending} onOpen={open} showRanks />
+          <Section title="Trending Now" books={data.trending} onOpen={open} />
           <Divider sx={{ my: 3 }} />
 
           <Section title="Popular Fiction" books={data.fiction} onOpen={open} />
           <Divider sx={{ my: 3 }} />
 
-          <Section title="Science & Technology" books={data.science} onOpen={open} />
-          <Divider sx={{ my: 3 }} />
-
           <Section title="History & Biography" books={data.histbio} onOpen={open} />
         </>
       )}
-
       <BookDialog open={dialog.open} onClose={close} book={dialog.book} />
     </Box>
   )

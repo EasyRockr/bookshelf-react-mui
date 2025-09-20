@@ -2,7 +2,6 @@ import React, { useRef, useState, useLayoutEffect } from 'react'
 import { Box, Button, Grid, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ShuffleIcon from '@mui/icons-material/Shuffle'
-import SimpleLoader from '../../components/common/SimpleLoader.jsx'
 import LoadingGrid from '../../components/common/LoadingGrid.jsx'
 import BookCard from '../../components/catalog/BookCard.jsx'
 import BookDialog from '../../components/details/BookDialog.jsx'
@@ -69,8 +68,8 @@ export default function Random() {
       .catch(() => setStatus('error'))
   }
 
-  // Centered control row (button), with optional top-right "Hello World"
-  const ControlRow = ({ showHello = false }) => (
+  // Centered control row (button), with optional hero title/subtitle above the button.
+  const ControlRow = ({ showHeroText = false }) => (
     <Box
       sx={{
         display: 'grid',
@@ -83,23 +82,19 @@ export default function Random() {
         gap: 1,
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', position: 'relative' }}>
-        {showHello && (
-          <Typography
-            component="h1"
-            variant="h6"
-            sx={{
-              alignSelf: 'flex-end',   // right edge of this row
-              mb: 0.5,
-              fontWeight: 800,
-              lineHeight: 1.2,
-              textTransform: 'none',
-            }}
-          >
-            Hello World
-          </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        {showHeroText && (
+          <>
+            <Typography variant="h4" sx={{ fontWeight: 800, m: 0, textAlign: 'center' }}>
+              Random Book Discovery
+            </Typography>
+            <Typography sx={{ color: 'text.secondary', textAlign: 'center', maxWidth: 400 }}>
+              Discover new books with our surprise selection
+            </Typography>
+          </>
         )}
-        <Button variant="contained" size="large" onClick={surprise} sx={{ fontWeight: 800 }}>
+
+        <Button variant="contained" size="large" onClick={surprise} sx={{ fontWeight: 800, mt: showHeroText ? 1 : 0 }}>
           <ShuffleIcon sx={{ mr: 1 }} />
           Surprise me!
         </Button>
@@ -131,8 +126,7 @@ export default function Random() {
           <Typography sx={{ color: 'text.secondary', textAlign: 'center', maxWidth: 400 }}>
             Discover new books with our surprise selection
           </Typography>
-          {/* No "Hello World" in hero */}
-          <ControlRow showHello={false} />
+          <ControlRow showHeroText={false} />
         </Box>
       )}
 
@@ -155,8 +149,8 @@ export default function Random() {
               placeItems: 'center',
             })}
           >
-            {/* Show "Hello World" above the button, aligned to the right */}
-            <ControlRow showHello />
+            {/* Title + subtitle above the button */}
+            <ControlRow showHeroText />
           </Box>
           {/* Spacer for the fixed bar */}
           <Box sx={(theme) => ({ height: `calc(${barH}px + ${theme.spacing(2)})` })} />
