@@ -3,12 +3,6 @@ import { Box, Typography, Chip } from '@mui/material'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import BookCard from './BookCard.jsx'
 
-/**
- * Props:
- * - sixUp: forces 6 columns at lg+ using CSS grid; cards fill cells
- * - compact: pass to card for shorter height & smaller text
- * - tight: smaller gaps/section spacing
- */
 export default function Section({
   title,
   books = [],
@@ -36,9 +30,9 @@ export default function Section({
     </Box>
   )
 
-  // Column and row gaps are independent now
-  const columnGap = tight ? 1 : 2        // horizontal space
-  const rowGap = tight ? 2 : 3           // vertical space (bigger than columns)
+
+  const columnGap = tight ? 1 : 2       
+  const rowGap = tight ? 2 : 3          
 
   return (
     <Box sx={{ mb: tight ? 1.5 : 2 }}>
@@ -49,12 +43,11 @@ export default function Section({
       )}
 
       {sixUp ? (
-        /* Guaranteed 6-up at lg+, cards fill each column; overlay chip to match prof UI */
         <Box
           sx={{
             display: 'grid',
             columnGap,
-            rowGap, // 👈 extra space between rows
+            rowGap,
             gridTemplateColumns: {
               xs: 'repeat(1, minmax(0, 1fr))',
               sm: 'repeat(2, minmax(0, 1fr))',
@@ -80,12 +73,11 @@ export default function Section({
           })}
         </Box>
       ) : (
-        /* Random.jsx look: centered, fixed-width cards; footer chip stays inside the card */
         <Box
           sx={{
             display: 'grid',
             columnGap,
-            rowGap, // 👈 extra space between rows
+            rowGap, 
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, max-content))',
             justifyContent: 'center',
           }}

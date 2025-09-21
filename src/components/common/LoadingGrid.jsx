@@ -1,4 +1,3 @@
-// src/components/common/LoadingGrid.jsx
 import React from 'react'
 import { Grid, Skeleton, Box } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
@@ -8,8 +7,8 @@ import { gridWrapSx } from '../../Styles/loading.sx.js'
 export default function LoadingGrid({
   count = 12,
   animation = 'pulse',
-  fullCard = false,     // true = single big skeleton the size of the whole card
-  itemProps = {},       // optional: pass { xs, sm, md, lg } if you want breakpoints
+  fullCard = false,     
+  itemProps = {},       
 }) {
   const t = useTheme()
   const coverH = IMAGE_H

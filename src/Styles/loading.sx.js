@@ -1,4 +1,3 @@
-// Simple spinner styles — no inline sx inside pages/components
 export const spinnerRowSx = (t) => ({
   display: 'flex',
   justifyContent: 'center',

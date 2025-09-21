@@ -1,1 +1,26 @@
-import React,{createContext,useMemo,useState,useContext}from'react';import{ThemeProvider as MuiThemeProvider,createTheme}from'@mui/material/styles';import themeOptions from'../../Styles/theme.sx.js';const ThemeModeContext=createContext({mode:'dark',toggle:()=>{}});export const useThemeMode=()=>useContext(ThemeModeContext);export default function ThemeProvider({children}){const[mode,setMode]=useState('dark');const value=useMemo(()=>({mode,toggle:()=>setMode(m=>m==='dark'?'light':'dark')}),[mode]);const theme=useMemo(()=>createTheme(themeOptions(mode)),[mode]);return(<ThemeModeContext.Provider value={value}><MuiThemeProvider theme={theme}>{children}</MuiThemeProvider></ThemeModeContext.Provider>)}
+import React, { createContext, useMemo, useState, useContext } from 'react'
+import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles'
+import themeOptions from '../../Styles/theme.sx.js'
+
+const ThemeModeContext = createContext({ mode: 'dark', toggle: () => {} })
+export const useThemeMode = () => useContext(ThemeModeContext)
+
+export default function ThemeProvider({ children }) {
+  const [mode, setMode] = useState('dark')
+
+  const value = useMemo(
+    () => ({
+      mode,
+      toggle: () => setMode(m => (m === 'dark' ? 'light' : 'dark')),
+    }),
+    [mode],
+  )
+
+  const theme = useMemo(() => createTheme(themeOptions(mode)), [mode])
+
+  return (
+    <ThemeModeContext.Provider value={value}>
+      <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
+    </ThemeModeContext.Provider>
+  )
+}

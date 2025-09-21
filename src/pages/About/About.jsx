@@ -13,7 +13,6 @@ import WcIcon from "@mui/icons-material/Wc";
 import DownloadIcon from "@mui/icons-material/Download";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 
-/** ======= Data ======= */
 const PEOPLE = [
   {
     initials: "FA",
@@ -39,19 +38,19 @@ const PEOPLE = [
     name: "MIRANDA, Robin",
     title: "Full-Stack Dev",
     location: "Bulacan",
-    phone: "09123456780",
-    email: "robin.miranda@example.com",
-    dob: "May 12, 2003",
+    phone: "09054116401",
+    email: "miranda.robin.t@gmail.com",
+    dob: "August 17, 2003",
     gender: "♂︎",
-    cv: "/cv-robin.pdf",
+    cv: "/robin_resume.pdf",
     skills: [
       "ReactJS","Material-UI","Node.js","Express","MongoDB","REST APIs","Axios",
-      "Vite","React Router","HTML","CSS","Git","GitHub","Docker","CI/CD","Unit Testing"
+      "Vite","React Router","HTML","CSS","Git","GitHub","Docker","CI/CD","Unit Testing",
+      "Laravel", "Tailwind CSS", "Figma", "Selenium", "Robot Framework"
     ]
   }
 ];
 
-/** ======= Styles ======= */
 const chipStyle = (label) => {
   const palette = ["#60a5fa","#22d3ee","#34d399","#f59e0b","#a78bfa","#fb7185","#f97316"];
   const i = (label.charCodeAt(0) + label.length) % palette.length;
@@ -82,7 +81,6 @@ function PersonCard({ p }) {
       }}
     >
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        {/* Header */}
         <Stack alignItems="center" spacing={1.25} sx={{ pt: 1 }}>
           <Avatar
             sx={{
@@ -111,7 +109,6 @@ function PersonCard({ p }) {
 
         <Divider sx={{ my: 1, borderColor: "rgba(255,255,255,0.12)" }} />
 
-        {/* Tabs (centered) */}
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
@@ -124,7 +121,6 @@ function PersonCard({ p }) {
           <Tab label="SKILLS" />
         </Tabs>
 
-        {/* ABOUT */}
         {tab === 0 && (
           <List dense sx={{ pt: 1 }}>
             <ListItem><ListItemIcon><LocationOnIcon /></ListItemIcon><ListItemText primary={p.location}/></ListItem>
@@ -135,7 +131,6 @@ function PersonCard({ p }) {
           </List>
         )}
 
-        {/* SKILLS */}
         {tab === 1 && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Stack direction="row" spacing={1} alignItems="center">
@@ -161,7 +156,6 @@ function PersonCard({ p }) {
   );
 }
 
-/** ======= Page ======= */
 export default function About() {
   return (
     <Box sx={{ px: { xs: 1.5, md: 3 }, py: { xs: 2, md: 3 } }}>
@@ -169,7 +163,6 @@ export default function About() {
         About the Developers
       </Typography>
 
-      {/* Stacked cards, wider X on desktop */}
       <Stack spacing={2.5} alignItems="center">
         {PEOPLE.map((p) => (
           <Box key={p.email} sx={{ width: { xs: "100%", sm: "98%", md: "94%", lg: "90%" }, maxWidth: 1280 }}>

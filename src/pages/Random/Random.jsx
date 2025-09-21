@@ -14,20 +14,16 @@ export default function Random() {
   const t = useTheme()
   const idxRef = useRef(0)
   const abortRef = useRef(null)
-
-  // UI state
-  const [status, setStatus] = useState('idle')   // idle | loading | done | empty | error
+  const [status, setStatus] = useState('idle')   
   const [rows, setRows] = useState([])
   const [dialog, setDialog] = useState({ open:false, book:null })
-  const [lift, setLift] = useState(false)        // slide-up hero on first click
+  const [lift, setLift] = useState(false)       
 
-  // AppBar height (fallback 64)
   const toolbarMinH =
     (typeof t.mixins.toolbar === 'object' && t.mixins.toolbar?.minHeight)
       ? t.mixins.toolbar.minHeight
       : 64
 
-  // Fixed control bar measurement
   const barRef = useRef(null)
   const [barH, setBarH] = useState(72)
   useLayoutEffect(() => {
@@ -44,19 +40,17 @@ export default function Random() {
     }
   }, [status])
 
-  // Abort any in-flight request on unmount
   useLayoutEffect(() => {
     return () => abortRef.current?.abort?.()
   }, [])
 
   const surprise = () => {
-    if (status === 'idle') setLift(true) // start slide-up on first click
+    if (status === 'idle') setLift(true) 
     setStatus('loading')
 
     const subject = SUBJECTS[idxRef.current % SUBJECTS.length]
     idxRef.current++
 
-    // cancel stale request
     abortRef.current?.abort?.()
     abortRef.current = new AbortController()
 
@@ -112,7 +106,6 @@ export default function Random() {
 
   return (
     <Box sx={{ p: 0 }}>
-      {/* --- HERO (mounted until the slide finishes) --- */}
       {(status === 'idle' || lift) && (
         <Box
           onTransitionEnd={() => { if (status !== 'idle') setLift(false) }}
@@ -138,7 +131,6 @@ export default function Random() {
         </Box>
       )}
 
-      {/* --- FIXED CONTROL BAR (appears after hero slides out) --- */}
       {status !== 'idle' && !lift && (
         <>
           <Box
@@ -157,15 +149,12 @@ export default function Random() {
               placeItems: 'center',
             })}
           >
-            {/* Title + subtitle above the button */}
             <ControlRow showHeroText />
           </Box>
-          {/* Spacer for the fixed bar */}
           <Box sx={(theme) => ({ height: `calc(${barH}px + ${theme.spacing(2)})` })} />
         </>
       )}
 
-      {/* RESULTS */}
       {status === 'loading' && <LoadingGrid count={12} />}
       {status === 'error'   && (
         <Typography color="error" sx={{ textAlign: 'center', mt: 2 }}>
@@ -178,7 +167,6 @@ export default function Random() {
         </Typography>
       )}
       {status === 'done'    && (
-        // ✅ sixUp layout: CSS grid forces 1/2/3/6 columns by breakpoint
         <Box
           sx={{
             mt: 0,
@@ -189,13 +177,12 @@ export default function Random() {
               xs: 'repeat(1, minmax(0, 1fr))',
               sm: 'repeat(2, minmax(0, 1fr))',
               md: 'repeat(3, minmax(0, 1fr))',
-              lg: 'repeat(6, minmax(0, 1fr))',  // ← six up at desktop
+              lg: 'repeat(6, minmax(0, 1fr))',  
             },
           }}
         >
           {rows.map((b) => (
             <Box key={b.key || b.id}>
-              {/* fill makes the card stretch to the cell width */}
               <BookCard book={b} fill onClick={() => setDialog({ open: true, book: b })} />
             </Box>
           ))}

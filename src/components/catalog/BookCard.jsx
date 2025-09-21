@@ -6,12 +6,6 @@ import {
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import StarIcon from '@mui/icons-material/Star'
 
-/**
- * Props:
- * - fill: make card stretch to container width (use for 6-up CSS grid)
- * - compact: shorter card + smaller text
- * - showTrendChip: render the footer chip (turn OFF when overlay chip is used)
- */
 export default function BookCard({
   book = {},
   onClick = () => {},
@@ -43,7 +37,6 @@ export default function BookCard({
     >
       <CardActionArea onClick={onClick} sx={{ alignItems: 'stretch' }}>
         {img && (
-          /* 2:3 aspect ratio (lower % when compact to shorten total card height) */
           <Box sx={{ position: 'relative', width: '100%', pt: compact ? '135%' : '150%' }}>
             <CardMedia
               component="img"

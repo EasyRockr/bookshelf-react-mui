@@ -1,4 +1,3 @@
-// src/components/details/BookDialog.jsx
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Box, Button, Typography, IconButton, Divider, Chip, CircularProgress, Card, CardMedia } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -12,7 +11,6 @@ const cleanDescription = (desc) => {
   if (!desc) return 'No description available.'
   let text = typeof desc === 'string' ? desc : desc.value || ''
 
-  // Normalize newlines and strip wiki/markdown-ish noise
   text = text.replace(/\r\n|\r|\n/g, ' ').trim()
   text = text.replace(/\[source\][\s\S]*$/gi, ' ').trim()
   text = text.replace(/\[[^\]]+\]\[\d+\]/g, ' ').trim()
@@ -56,7 +54,6 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
       .finally(() => setLoading(false))
   }, [open, book?.key])
 
-  // Build a safe cover src:
   const coverSrc = useMemo(() => {
     if (book?.coverUrl) return book.coverUrl
     const fromBookId = book?.cover_i

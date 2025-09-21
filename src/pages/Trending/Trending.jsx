@@ -1,4 +1,3 @@
-// src/pages/Trending/Trending.jsx
 import React, { useEffect, useState } from 'react'
 import { Box, Typography, Divider } from '@mui/material'
 import { pageWrapSx, pageTitleSx } from '../../Styles/page.sx.js'
@@ -42,7 +41,6 @@ export default function Trending() {
       return out
     }
 
-    // Trending Now = /trending/daily.json
     const fetchTrendingDaily = axios({
       url: `${OL_ROOT}/trending/daily.json`,
       method: 'GET',
@@ -52,7 +50,6 @@ export default function Trending() {
     }).then(r => (r.data?.works || []).slice(0, 12).map(normalizeDoc))
       .catch(() => [])
 
-    // Popular Fiction
     const fetchPopularFiction = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
@@ -63,7 +60,6 @@ export default function Trending() {
     }).then(r => (r.data?.docs || []).map(normalizeDoc))
       .catch(() => [])
 
-    // Science & Technology
     const fetchScience = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
@@ -84,7 +80,6 @@ export default function Trending() {
     }).then(r => (r.data?.docs || []).map(normalizeDoc))
       .catch(() => [])
 
-    // History & Biography (history, with biography top-up)
     const fetchHistBio = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
