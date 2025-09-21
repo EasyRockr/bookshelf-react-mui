@@ -45,7 +45,7 @@ const PEOPLE = [
     name: "MIRANDA, Robin",
     title: "Full-Stack Dev",
     location: "Bulacan",
-    phone: "09123456780",
+    phone: "09054116401",
     email: "miranda.robin.t@gmail.com",
     dob: "August 17, 2003",
     gender: "♂︎",
