@@ -1,4 +1,3 @@
-// src/pages/Random/Random.jsx
 import React, { useRef, useState, useLayoutEffect } from 'react'
 import { Box, Button, Grid, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
@@ -179,13 +178,28 @@ export default function Random() {
         </Typography>
       )}
       {status === 'done'    && (
-        <Grid container spacing={2} justifyContent="center" sx={{ mt: 0, px: 2 }}>
+        // ✅ sixUp layout: CSS grid forces 1/2/3/6 columns by breakpoint
+        <Box
+          sx={{
+            mt: 0,
+            px: 2,
+            display: 'grid',
+            gap: 2,
+            gridTemplateColumns: {
+              xs: 'repeat(1, minmax(0, 1fr))',
+              sm: 'repeat(2, minmax(0, 1fr))',
+              md: 'repeat(3, minmax(0, 1fr))',
+              lg: 'repeat(6, minmax(0, 1fr))',  // ← six up at desktop
+            },
+          }}
+        >
           {rows.map((b) => (
-            <Grid item key={b.key || b.id}>
-              <BookCard book={b} onClick={() => setDialog({ open: true, book: b })} />
-            </Grid>
+            <Box key={b.key || b.id}>
+              {/* fill makes the card stretch to the cell width */}
+              <BookCard book={b} fill onClick={() => setDialog({ open: true, book: b })} />
+            </Box>
           ))}
-        </Grid>
+        </Box>
       )}
 
       <BookDialog

@@ -168,15 +168,29 @@ export default function Browse() {
       )}
 
       {/* RESULTS */}
-      {status === 'loading' && <LoadingGrid count={12} />}
+ {status === 'loading' && <LoadingGrid count={12} />}
       {status === 'done' && (
-        <Grid container spacing={2} sx={{ mt: 0, justifyContent: 'center' }}>
+        // ✅ sixUp layout here too (optional—remove if you want centered, fixed width)
+        <Box
+          sx={{
+            mt: 0,
+            px: 2,
+            display: 'grid',
+            gap: 2,
+            gridTemplateColumns: {
+              xs: 'repeat(1, minmax(0, 1fr))',
+              sm: 'repeat(2, minmax(0, 1fr))',
+              md: 'repeat(3, minmax(0, 1fr))',
+              lg: 'repeat(6, minmax(0, 1fr))',
+            },
+          }}
+        >
           {rows.map((b) => (
-            <Grid item key={b.key || b.id}>
-              <BookCard book={b} onClick={() => setDialog({ open: true, book: b })} />
-            </Grid>
+            <Box key={b.key || b.id}>
+              <BookCard book={b} fill onClick={() => setDialog({ open: true, book: b })} />
+            </Box>
           ))}
-        </Grid>
+        </Box>
       )}
 
       <BookDialog

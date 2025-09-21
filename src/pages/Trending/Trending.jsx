@@ -31,7 +31,6 @@ export default function Trending() {
     setIsLoading(true)
     setErrorMessage('')
 
-    // helper: dedupe by key/id
     const dedupeByKey = (arr) => {
       const seen = new Set()
       const out = []
@@ -43,7 +42,7 @@ export default function Trending() {
       return out
     }
 
-    // ✅ Trending Now = /trending/daily.json  (matches your professor’s screenshot)
+    // Trending Now = /trending/daily.json
     const fetchTrendingDaily = axios({
       url: `${OL_ROOT}/trending/daily.json`,
       method: 'GET',
@@ -53,7 +52,7 @@ export default function Trending() {
     }).then(r => (r.data?.works || []).slice(0, 12).map(normalizeDoc))
       .catch(() => [])
 
-    // Popular Fiction = subject: fiction (leave as-is)
+    // Popular Fiction
     const fetchPopularFiction = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
@@ -64,7 +63,7 @@ export default function Trending() {
     }).then(r => (r.data?.docs || []).map(normalizeDoc))
       .catch(() => [])
 
-    // Science & Technology = merge science + technology
+    // Science & Technology
     const fetchScience = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
@@ -85,7 +84,7 @@ export default function Trending() {
     }).then(r => (r.data?.docs || []).map(normalizeDoc))
       .catch(() => [])
 
-    // History & Biography (history, top up with biography if history < 6)
+    // History & Biography (history, with biography top-up)
     const fetchHistBio = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
@@ -119,7 +118,6 @@ export default function Trending() {
       if (!live) return
       const toList = (res) => res.status === 'fulfilled' ? (res.value || []) : []
 
-      // add rank for the chip (#1 Trending, #2, …)
       const trending = toList(tr).map((b, i) => ({
         ...b,
         trendRank: i + 1,
@@ -153,22 +151,18 @@ export default function Trending() {
       {isLoading && <LoadingGrid count={12} animation="pulse" />}
 
       {!isLoading && (
-        <>
-          {errorMessage && (
-            <Typography color="warning.main" sx={{ textAlign:'center', mb: 2 }}>{errorMessage}</Typography>
-          )}
+      <>
+        <Section title="Trending Now"          books={data.trending} onOpen={open} sixUp compact tight />
+        <Divider sx={{ my: 3 }} />
 
-          <Section title="Trending Now" books={data.trending} onOpen={open} />
-          <Divider sx={{ my: 3 }} />
+        <Section title="Popular Fiction"       books={data.fiction}  onOpen={open} sixUp compact tight />
+        <Divider sx={{ my: 3 }} />
 
-          <Section title="Popular Fiction" books={data.fiction} onOpen={open} />
-          <Divider sx={{ my: 3 }} />
+        <Section title="Science & Technology"  books={data.scitech}  onOpen={open} sixUp compact tight />
+        <Divider sx={{ my: 3 }} />
 
-          <Section title="Science & Technology" books={data.scitech} onOpen={open} />
-          <Divider sx={{ my: 3 }} />
-
-          <Section title="History & Biography" books={data.histbio} onOpen={open} />
-        </>
+        <Section title="History & Biography"   books={data.histbio}  onOpen={open} sixUp compact tight />
+      </>
       )}
       <BookDialog open={dialog.open} onClose={close} book={dialog.book} />
     </Box>
