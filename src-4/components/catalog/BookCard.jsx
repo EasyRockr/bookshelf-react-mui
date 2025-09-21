@@ -1,4 +1,3 @@
-// src/components/catalog/BookCard.jsx
 import React from 'react'
 import {
   Card, CardActionArea, CardMedia, CardContent,
@@ -22,7 +21,7 @@ export default function BookCard({ book = {}, onClick = () => {} }) {
     <Card
       elevation={2}
       sx={{
-        width: 240,                  // comfortable width like your prof’s shot
+        width: '100%',
         borderRadius: 2,
         overflow: 'hidden',
         bgcolor: 'background.paper'
@@ -39,7 +38,6 @@ export default function BookCard({ book = {}, onClick = () => {} }) {
         )}
 
         <CardContent sx={{ pb: 1.75 }}>
-          {/* Title */}
           <Typography
             variant="subtitle1"
             sx={{ fontWeight: 800, lineHeight: 1.2 }}
@@ -49,7 +47,6 @@ export default function BookCard({ book = {}, onClick = () => {} }) {
             {title}
           </Typography>
 
-          {/* Author */}
           <Typography
             variant="body2"
             color="text.secondary"
@@ -60,12 +57,10 @@ export default function BookCard({ book = {}, onClick = () => {} }) {
             by {author}
           </Typography>
 
-          {/* Published year */}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             Published: {year || 'Unknown'}
           </Typography>
 
-          {/* Footer row: left chip (if present), right rating */}
           <Box
             sx={{
               display: 'flex',
@@ -84,11 +79,11 @@ export default function BookCard({ book = {}, onClick = () => {} }) {
                   color: 'grey.100',
                   fontWeight: 800,
                   height: 24,
-                  '& .MuiChip-label': { px: 1, pt: '1px' }, // slightly tighter like the screenshot
+                  '& .MuiChip-label': { px: 1, pt: '1px' },
                 }}
               />
             ) : (
-              <Box /> // keep spacing when no chip
+              <Box />
             )}
 
             <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>

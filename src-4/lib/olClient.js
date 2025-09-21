@@ -1,11 +1,7 @@
-// src/lib/olClient.js
 import axios from 'axios';
 
-// Absolute public domains
 export const OL_ROOT = 'https://openlibrary.org';
 export const COVERS_ROOT = 'https://covers.openlibrary.org';
-
-// Fallback cover (use a reliable host or swap to your own /public asset)
 export const NO_COVER_URL = 'https://placehold.co/300x450?text=No%20Cover';
 
 /** Keep %20 (not '+') for spaces */
@@ -20,15 +16,12 @@ export const qsSerialize = (params = {}) => {
   return parts.join('&');
 };
 
-// Optional axios instance (kept for compatibility).
-// NOTE: No timeout here (as requested: remove timers that end GETs).
 export const ol = axios.create({
   baseURL: OL_ROOT,
   headers: { Accept: 'application/json' },
   paramsSerializer: (p) => qsSerialize(p || {}),
 });
 
-// ---- Utilities (unchanged API) ------------------------------------
 export const ratingForKey = (key = 'x') =>
   ((Array.from(key).reduce((a, c) => ((a * 33 + c.charCodeAt(0)) >>> 0), 0) % 11) * 0.5);
 
@@ -51,5 +44,4 @@ export const normalizeDoc = (doc = {}) => ({
   genres: Array.isArray(doc.subject) ? doc.subject.slice(0, 3) : [],
 });
 
-// Re-export axios for convenience
 export { axios };

@@ -1,4 +1,3 @@
-// src/components/details/BookDialog.jsx
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Box, Button, Typography, IconButton, Divider, Chip, CircularProgress, Card, CardMedia } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -11,9 +10,8 @@ import { divSpace, centerRow, tagRow } from '../../Styles/dialogExtras.sx.js'
 const cleanDescription = (desc) => {
   if (!desc) return 'No description available.'
   let text = typeof desc === 'string' ? desc : desc.value || ''
-  text = text.replace(/
-||
-/g, ' ').trim()
+
+  text = text.replace(/\r\n|\r|\n/g, ' ').trim()
   text = text.replace(/\[source\][\s\S]*$/gi, ' ').trim()
   text = text.replace(/\[[^\]]+\]\[\d+\]/g, ' ').trim()
   text = text.replace(/^\s*\[\d+\]:\s*\S+(?:\s+\S+)*$/gim, ' ').trim()
@@ -21,15 +19,16 @@ const cleanDescription = (desc) => {
   text = text.replace(/\[([^\]]+)\]\((?:[^)]+)\)/g, '$1')
   text = text.replace(/https?:\/\/\S+/gi, ' ')
   text = text.replace(/[-=]{3,}/g, ' ')
-  text = text.replace(/(?:Contained in:|See also:)[\s\S]*$/gi, '').trim()
-  text = text.replace(/\*+\s*Also[:.]?/gi, ' ')
-  text = text.replace(/[*_]{1,}/g, ' ')
+  text = text.replace(/\b(?:Contained in:|See also:)\b[\s\S]*$/gi, '').trim()
+  text = text.replace(/\*+\s*Also\b[:.]?/gi, ' ')
+  text = text.replace(/[\*_]{1,}/g, ' ')
   text = text.replace(/\s*\[\d+\]\s*/g, ' ')
   text = text.replace(/\(\s*\)|\[\s*\]|\{\s*\}/g, ' ')
   text = text.replace(/[\(\[\{]\s*$/g, ' ')
-  text = text.replace(/Also\.?$/i, ' ')
+  text = text.replace(/\bAlso\.?$/i, ' ')
   text = text.replace(/^[\s\.\-:,;\/]+|[\s\.\-:,;\/]+$/g, ' ')
   text = text.replace(/\s+/g, ' ').trim()
+
   if (!text || text.replace(/[^\w]/g, '').length < 3) return 'No description available.'
   if (!/[.!?]$/.test(text)) text += '.'
   return text
@@ -39,7 +38,7 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
   const t = useTheme()
   const [loading, setLoading] = useState(false)
   const [details, setDetails] = useState(null)
-  const [showFull, setShowFull] = useState(false);
+  const [showFull, setShowFull] = useState(false)
 
   useEffect(() => {
     if (!open || !book?.key) return
@@ -55,7 +54,6 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
       .finally(() => setLoading(false))
   }, [open, book?.key])
 
-  // Build a safe cover src:
   const coverSrc = useMemo(() => {
     if (book?.coverUrl) return book.coverUrl
     const fromBookId = book?.cover_i
@@ -71,14 +69,14 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
     ? book.rating.toFixed(1)
     : (book?.rating && !Number.isNaN(Number(book.rating)) ? Number(book.rating).toFixed(1) : 'N/A')
 
-  const fullDesc = cleanDescription(details?.description);
-  const limit = 300;
+  const fullDesc = cleanDescription(details?.description)
+  const limit = 300
   const visibleDesc =
     !fullDesc
       ? 'No description available.'
       : showFull || fullDesc.length <= limit
         ? fullDesc
-        : fullDesc.slice(0, limit).trimEnd() + '…';
+        : fullDesc.slice(0, limit).trimEnd() + '…'
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -87,7 +85,6 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
           <CloseIcon />
         </IconButton>
 
-        {/* LEFT */}
         <Box sx={leftPaneSx(t)}>
           <Card sx={leftCardSx(t)}>
             {coverSrc ? (
@@ -100,7 +97,6 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
           </Card>
         </Box>
 
-        {/* RIGHT */}
         <Box sx={rightPaneSx(t)}>
           {loading && (
             <Box sx={centerRow(t)}>

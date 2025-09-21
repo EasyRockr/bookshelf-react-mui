@@ -1,4 +1,3 @@
-// src/pages/Trending/Trending.jsx
 import React, { useEffect, useState } from 'react'
 import { Box, Typography, Divider } from '@mui/material'
 import { pageWrapSx, pageTitleSx } from '../../Styles/page.sx.js'
@@ -14,7 +13,12 @@ export default function Trending() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [dialog, setDialog] = useState({ open:false, book:null })
-  const [data, setData] = useState({ trending:[], fiction:[], histbio:[] })
+  const [data, setData] = useState({
+    trending: [],
+    fiction: [],
+    scitech: [],
+    histbio: []
+  })
 
   const open = (b) => setDialog({ open: true, book: b })
   const close = () => setDialog({ open: false, book: null })
@@ -26,27 +30,55 @@ export default function Trending() {
     setIsLoading(true)
     setErrorMessage('')
 
-    // Base ordering:
-    // Trending Now: fiction
-    // Popular Fiction: science
-    // History & Biography: history (+ biography top-up)
-    const fetchTrendingFromFiction = axios({
+    const dedupeByKey = (arr) => {
+      const seen = new Set()
+      const out = []
+      for (const it of arr) {
+        const k = it.key || it.id
+        if (!k || seen.has(k)) continue
+        seen.add(k); out.push(it)
+      }
+      return out
+    }
+
+    const fetchTrendingDaily = axios({
+      url: `${OL_ROOT}/trending/daily.json`,
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      paramsSerializer: (p) => qsSerialize(p),
+      signal: ctrl.signal,
+    }).then(r => (r.data?.works || []).slice(0, 12).map(normalizeDoc))
+      .catch(() => [])
+
+    const fetchPopularFiction = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
       params: { subject: 'fiction', limit: 12 },
       headers: { Accept: 'application/json' },
       paramsSerializer: (p) => qsSerialize(p),
       signal: ctrl.signal,
-    }).then(r => (r.data?.docs || []).map(normalizeDoc)).catch(() => [])
+    }).then(r => (r.data?.docs || []).map(normalizeDoc))
+      .catch(() => [])
 
-    const fetchFictionFromScience = axios({
+    const fetchScience = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
       params: { subject: 'science', limit: 12 },
       headers: { Accept: 'application/json' },
       paramsSerializer: (p) => qsSerialize(p),
       signal: ctrl.signal,
-    }).then(r => (r.data?.docs || []).map(normalizeDoc)).catch(() => [])
+    }).then(r => (r.data?.docs || []).map(normalizeDoc))
+      .catch(() => [])
+
+    const fetchTechnology = axios({
+      url: `${OL_ROOT}/search.json`,
+      method: 'GET',
+      params: { subject: 'technology', limit: 12 },
+      headers: { Accept: 'application/json' },
+      paramsSerializer: (p) => qsSerialize(p),
+      signal: ctrl.signal,
+    }).then(r => (r.data?.docs || []).map(normalizeDoc))
+      .catch(() => [])
 
     const fetchHistBio = axios({
       url: `${OL_ROOT}/search.json`,
@@ -56,32 +88,45 @@ export default function Trending() {
       paramsSerializer: (p) => qsSerialize(p),
       signal: ctrl.signal,
     })
-    .then(async (r) => {
-      const hist = (r.data?.docs || []).map(normalizeDoc)
-      if (hist.length >= 6) return hist
-      const bio = await axios({
-        url: `${OL_ROOT}/search.json`,
-        method: 'GET',
-        params: { subject: 'biography', limit: 12 },
-        headers: { Accept: 'application/json' },
-        paramsSerializer: (p) => qsSerialize(p),
-        signal: ctrl.signal,
-      }).then(r2 => (r2.data?.docs || []).map(normalizeDoc)).catch(() => [])
-      return [...hist, ...bio].slice(0, 12)
-    })
-    .catch(() => [])
+      .then(async (r) => {
+        const hist = (r.data?.docs || []).map(normalizeDoc)
+        if (hist.length >= 6) return hist
+        const bio = await axios({
+          url: `${OL_ROOT}/search.json`,
+          method: 'GET',
+          params: { subject: 'biography', limit: 12 },
+          headers: { Accept: 'application/json' },
+          paramsSerializer: (p) => qsSerialize(p),
+          signal: ctrl.signal,
+        }).then(r2 => (r2.data?.docs || []).map(normalizeDoc)).catch(() => [])
+        return [...hist, ...bio].slice(0, 12)
+      })
+      .catch(() => [])
 
-    Promise.allSettled([fetchTrendingFromFiction, fetchFictionFromScience, fetchHistBio]).then(([tr, fi, hi]) => {
+    Promise.allSettled([
+      fetchTrendingDaily,
+      fetchPopularFiction,
+      fetchScience,
+      fetchTechnology,
+      fetchHistBio
+    ]).then(([tr, fi, sci, tech, hi]) => {
       if (!live) return
       const toList = (res) => res.status === 'fulfilled' ? (res.value || []) : []
-      const next = {
-        trending: toList(tr),
+
+      const trending = toList(tr).map((b, i) => ({
+        ...b,
+        trendRank: i + 1,
+        trendLabel: `#${i + 1} Trending`,
+      }))
+
+      const scitech = dedupeByKey([...toList(sci), ...toList(tech)]).slice(0, 12)
+
+      setData({
+        trending,
         fiction: toList(fi),
+        scitech,
         histbio: toList(hi),
-      }
-      const total = next.trending.length + next.fiction.length + next.histbio.length
-      if (total === 0) setErrorMessage('Failed to reach the books service. Showing placeholders.')
-      setData(next)
+      })
       setIsLoading(false)
     }).catch(() => {
       if (!live) return
@@ -110,6 +155,9 @@ export default function Trending() {
           <Divider sx={{ my: 3 }} />
 
           <Section title="Popular Fiction" books={data.fiction} onOpen={open} />
+          <Divider sx={{ my: 3 }} />
+
+          <Section title="Science & Technology" books={data.scitech} onOpen={open} />
           <Divider sx={{ my: 3 }} />
 
           <Section title="History & Biography" books={data.histbio} onOpen={open} />
