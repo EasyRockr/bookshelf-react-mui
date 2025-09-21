@@ -10,7 +10,6 @@ import { divSpace, centerRow, tagRow } from '../../Styles/dialogExtras.sx.js'
 const cleanDescription = (desc) => {
   if (!desc) return 'No description available.'
   let text = typeof desc === 'string' ? desc : desc.value || ''
-
   text = text.replace(/\r\n|\r|\n/g, ' ').trim()
   text = text.replace(/\[source\][\s\S]*$/gi, ' ').trim()
   text = text.replace(/\[[^\]]+\]\[\d+\]/g, ' ').trim()
@@ -28,7 +27,6 @@ const cleanDescription = (desc) => {
   text = text.replace(/\bAlso\.?$/i, ' ')
   text = text.replace(/^[\s\.\-:,;\/]+|[\s\.\-:,;\/]+$/g, ' ')
   text = text.replace(/\s+/g, ' ').trim()
-
   if (!text || text.replace(/[^\w]/g, '').length < 3) return 'No description available.'
   if (!/[.!?]$/.test(text)) text += '.'
   return text
@@ -84,8 +82,6 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
         <IconButton onClick={onClose} sx={closeBtnSx(t)} aria-label="Close">
           <CloseIcon />
         </IconButton>
-
-        {/* LEFT */}
         <Box sx={leftPaneSx(t)}>
           <Card sx={leftCardSx(t)}>
             {coverSrc ? (
@@ -97,46 +93,39 @@ export default function BookDialog({ open = false, onClose = () => {}, book = nu
             )}
           </Card>
         </Box>
-
-        {/* RIGHT */}
         <Box sx={rightPaneSx(t)}>
           {loading && (
             <Box sx={centerRow(t)}>
               <CircularProgress />
             </Box>
           )}
-
           {!loading && !book && (
             <Box sx={centerRow(t)}>
               <Typography variant="body2" color="text.secondary">No book selected.</Typography>
             </Box>
           )}
-
           {!loading && book && (
             <>
               <Typography variant="h4" fontWeight={800} gutterBottom>{safeTitle}</Typography>
               <Typography variant="h6" color="text.secondary" gutterBottom>{safeAuthor}</Typography>
-
               <Box sx={metaRowSx(t)}>
                 <Typography variant="body2">⭐ {safeRating}</Typography>
                 <Typography variant="body2">•</Typography>
                 <Typography variant="body2">📅 {safeYear}</Typography>
               </Box>
-
               <Divider sx={divSpace(t)} />
-
               <Typography variant="body1" sx={{ mb: 3 }}>
                 {visibleDesc}
               </Typography>
-
-              <Button
-                size="small"
-                onClick={() => setShowFull(v => !v)}
-                sx={{ fontWeight: 700, px: 0 }}
-              >
-                {showFull ? 'Show less' : 'Read more'}
-              </Button>
-
+              {fullDesc && fullDesc.length > limit && fullDesc !== 'No description available.' && (
+                <Button
+                  size="small"
+                  onClick={() => setShowFull(v => !v)}
+                  sx={{ fontWeight: 700, px: 0 }}
+                >
+                  {showFull ? 'Show less' : 'Read more'}
+                </Button>
+              )}
               {!!(details?.subjects?.length) && (
                 <Box sx={{ mt: 1 }}>
                   <Typography variant="subtitle1" gutterBottom>Subjects:</Typography>
