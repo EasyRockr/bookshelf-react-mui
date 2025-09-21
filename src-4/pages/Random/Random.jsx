@@ -113,7 +113,6 @@ export default function Random() {
 
   return (
     <Box sx={{ p: 0 }}>
-      {/* --- HERO (mounted until the slide finishes) --- */}
       {(status === 'idle' || lift) && (
         <Box
           onTransitionEnd={() => { if (status !== 'idle') setLift(false) }}
@@ -139,7 +138,6 @@ export default function Random() {
         </Box>
       )}
 
-      {/* --- FIXED CONTROL BAR (appears after hero slides out) --- */}
       {status !== 'idle' && !lift && (
         <>
           <Box
@@ -158,15 +156,12 @@ export default function Random() {
               placeItems: 'center',
             })}
           >
-            {/* Title + subtitle above the button */}
             <ControlRow showHeroText />
           </Box>
-          {/* Spacer for the fixed bar */}
           <Box sx={(theme) => ({ height: `calc(${barH}px + ${theme.spacing(2)})` })} />
         </>
       )}
 
-      {/* RESULTS */}
       {status === 'loading' && <LoadingGrid count={12} />}
       {status === 'error'   && (
         <Typography color="error" sx={{ textAlign: 'center', mt: 2 }}>

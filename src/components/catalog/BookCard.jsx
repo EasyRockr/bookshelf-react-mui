@@ -2,7 +2,16 @@ import React from 'react'
 import { Card, CardContent, Typography, Box, Chip, Rating } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import LazyImg from '../common/LazyImg.jsx'
-import { CARD_W, CARD_H, IMAGE_H, cardSx } from '../../Styles/bookCard.sx.js'
+import {
+  IMAGE_H,
+  cardSx,
+  contentSx,
+  titleSx,
+  authorSx,
+  starRowSx,
+  noRatingSx,
+  genresRowSx,
+} from '../../Styles/bookCard.sx.js'
 
 export default function BookCard({ book, onClick }) {
   const t = useTheme()
@@ -16,25 +25,35 @@ export default function BookCard({ book, onClick }) {
         width="100%"
       />
 
-      <CardContent sx={{ flex: 1, p: 1.5, gap: 0.5, display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.2 }} noWrap title={book.title}>
+      <CardContent sx={contentSx}>
+        <Typography variant="subtitle2" sx={titleSx} noWrap title={book.title}>
           {book.title || 'Untitled'}
         </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap title={book.author}>
+
+        <Typography variant="caption" sx={authorSx} noWrap title={book.author}>
           {book.author || 'Unknown'}
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 'auto' }}>
-          <Rating size="small" precision={0.5} value={Number(book.rating || 0)} readOnly />
+        <Box sx={starRowSx}>
+          <Rating
+            size="small"
+            precision={0.5}
+            value={Number(book.rating || 0)}
+            readOnly
+          />
           {book.rating ? (
-            <Typography variant="caption">{Number(book.rating).toFixed(1)}</Typography>
+            <Typography variant="caption">
+              {Number(book.rating).toFixed(1)}
+            </Typography>
           ) : (
-            <Typography variant="caption" sx={{ color: 'text.disabled' }}>No rating</Typography>
+            <Typography variant="caption" sx={noRatingSx}>
+              No rating
+            </Typography>
           )}
         </Box>
 
         {Array.isArray(book.genres) && book.genres.length > 0 && (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+          <Box sx={genresRowSx}>
             {book.genres.slice(0, 2).map((g) => (
               <Chip key={g} size="small" label={g} />
             ))}

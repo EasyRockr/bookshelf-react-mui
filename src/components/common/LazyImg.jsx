@@ -14,7 +14,6 @@ export default function LazyImg({ src, alt = '', sx = {}, height = '100%', width
   return (
     <Box sx={{ position: 'relative', height, width }}>
       {!loaded && <Skeleton variant="rectangular" width="100%" height="100%" />}
-      {/* Using Box as 'img' so we can control display */}
       <Box
         component="img"
         src={src}

@@ -1,11 +1,9 @@
-// src/lib/olClient.js
 import axios from 'axios';
 
 // Absolute public domains
 export const OL_ROOT = 'https://openlibrary.org';
 export const COVERS_ROOT = 'https://covers.openlibrary.org';
 
-/** Keep %20 (not '+') for spaces */
 export const qsSerialize = (params = {}) => {
   const parts = [];
   const add = (k, v) => {

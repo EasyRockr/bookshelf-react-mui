@@ -1,31 +1,39 @@
-// src/pages/Browse/Browse.jsx
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Box, Grid, TextField, InputAdornment, Button, Typography, Alert } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { useTheme } from '@mui/material/styles'
 import axios from 'axios'
 import { OL_ROOT, qsSerialize, normalizeDoc } from '../../lib/olClient.js'
-import SimpleLoader from '../../components/common/SimpleLoader.jsx'
 import LoadingGrid from '../../components/common/LoadingGrid.jsx'
 import BookCard from '../../components/catalog/BookCard.jsx'
 import BookDialog from '../../components/details/BookDialog.jsx'
+import {
+  containerSx,
+  searchRowBoxSx,
+  searchFieldSx,
+  searchButtonSx,
+  idleWrapperSx,
+  idleTitleSx,
+  fixedBarSx,
+  emptyAlertSx,
+  errorAlertSx,
+  gridSx,
+} from '../../Styles/browse.sx.js'
 
 export default function Browse() {
   const t = useTheme()
   const [q, setQ] = useState('')
-  const [status, setStatus] = useState('idle') // idle | loading | done | empty | error
+  const [status, setStatus] = useState('idle') 
   const [rows, setRows] = useState([])
   const [dialog, setDialog] = useState({ open:false, book:null })
 
-  // AppBar/Toolbar height (fallback 64)
   const toolbarMinH =
     (typeof t.mixins.toolbar === 'object' && t.mixins.toolbar?.minHeight)
       ? t.mixins.toolbar.minHeight
       : 64
 
-  // Measure fixed search bar so content starts below it
   const barRef = useRef(null)
-  const [barH, setBarH] = useState(88) // safe default so there's space on first paint
+  const [barH, setBarH] = useState(88) 
 
   useLayoutEffect(() => {
     if (status === 'idle' || !barRef.current) return
@@ -61,29 +69,14 @@ export default function Browse() {
       .catch(() => setStatus('error'))
   }
 
-  // Shared container so search row and info bar are perfectly parallel
-  const containerSx = {
-    width: { xs: '92vw', sm: '85vw', md: '70vw' },
-    maxWidth: 1000,
-    mx: 'auto',
-    px: 2,
-  }
-
-  // Shared search row (inner content doesn't set width; parent does)
   const SearchRow = (
-    <Box component="form" onSubmit={onSubmit}
-      sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 0 }}>
+    <Box component="form" onSubmit={onSubmit} sx={searchRowBoxSx}>
       <TextField
         value={q}
         onChange={(e)=>setQ(e.target.value)}
         placeholder="Search for books, authors, or subjects…"
         fullWidth
-        sx={{
-          flex: 1,
-          minWidth: 0,
-          '& .MuiInputBase-root': { height: 60 },
-          '& input': { fontSize: 14, fontWeight: 600, p: '10px 12px' },
-        }}
+        sx={searchFieldSx}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -94,8 +87,9 @@ export default function Browse() {
       />
       <Button
         type="submit"
-        variant="contained"
-        sx={{ minWidth: 112, height: 60, px: 3, fontSize: 13, fontWeight: 800 }}
+        variant="outlined"
+        color='black'
+        sx={searchButtonSx}
       >
         SEARCH
       </Button>
@@ -104,54 +98,26 @@ export default function Browse() {
 
   return (
     <Box sx={{ p: 0 }}>
-      {/* HERO (centered) BEFORE SEARCH */}
       {status === 'idle' && (
-        <Box
-          sx={{
-            height: `calc(100dvh - ${toolbarMinH}px)`,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 1.5,
-            overflow: 'hidden',
-          }}
-        >
-          <Typography variant="h4" sx={{ fontWeight: 800, m: 0, textAlign: 'center' }}>
+        <Box sx={idleWrapperSx(toolbarMinH)}>
+          <Typography variant="h4" sx={idleTitleSx}>
             Browse Books
           </Typography>
           <Box sx={containerSx}>{SearchRow}</Box>
         </Box>
       )}
 
-      {/* FIXED SEARCH BAR (always visible) AFTER SEARCH */}
       {status !== 'idle' && (
         <>
-          <Box
-            ref={barRef}
-            sx={(theme) => ({
-              position: 'fixed',
-              top: `${toolbarMinH}px`,         // under the AppBar
-              left: 0,
-              right: 0,
-              zIndex: theme.zIndex.appBar - 1, // below AppBar
-              marginTop: 1,
-              bgcolor: 'background.default',
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-              py: 1.5,
-            })}
-          >
+          <Box ref={barRef} sx={(theme) => fixedBarSx(theme, toolbarMinH)}>
             <Box sx={containerSx}>{SearchRow}</Box>
           </Box>
 
-          {/* Reserve space for fixed bar + extra vertical gap */}
           <Box sx={{ height: `calc(${barH}px + 16px)` }} />
 
-          {/* INFO / ERROR BARS (match search width via shared container) */}
           {status === 'empty' && (
             <Box sx={{ ...containerSx, mb: 2 }}>
-              <Alert severity="info" variant="outlined" sx={{ alignItems: 'center' }}>
+              <Alert severity="info" variant="outlined" sx={emptyAlertSx}>
                 No books found. Try a different search term.
               </Alert>
             </Box>
@@ -159,7 +125,7 @@ export default function Browse() {
 
           {status === 'error' && (
             <Box sx={{ ...containerSx, mb: 2 }}>
-              <Alert severity="error" variant="outlined" sx={{ alignItems: 'center' }}>
+              <Alert severity="error" variant="outlined" sx={errorAlertSx}>
                 Something went wrong. Please try again.
               </Alert>
             </Box>
@@ -167,10 +133,9 @@ export default function Browse() {
         </>
       )}
 
-      {/* RESULTS */}
       {status === 'loading' && <LoadingGrid count={12} />}
       {status === 'done' && (
-        <Grid container spacing={2} sx={{ mt: 0, justifyContent: 'center' }}>
+        <Grid container spacing={2} sx={gridSx}>
           {rows.map((b) => (
             <Grid item key={b.key || b.id}>
               <BookCard book={b} onClick={() => setDialog({ open: true, book: b })} />

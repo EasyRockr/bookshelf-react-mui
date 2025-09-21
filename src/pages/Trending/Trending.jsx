@@ -1,4 +1,3 @@
-// src/pages/Trending/Trending.jsx
 import React, { useEffect, useState } from 'react'
 import { Box, Typography, Divider } from '@mui/material'
 import { pageWrapSx, pageTitleSx } from '../../Styles/page.sx.js'
@@ -14,7 +13,7 @@ export default function Trending() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [dialog, setDialog] = useState({ open:false, book:null })
-  const [data, setData] = useState({ trending:[], fiction:[], histbio:[] })
+  const [data, setData] = useState({ trending:[], fiction:[], science:[], histbio:[] })
 
   const open = (b) => setDialog({ open: true, book: b })
   const close = () => setDialog({ open: false, book: null })
@@ -28,9 +27,11 @@ export default function Trending() {
 
     // Base ordering:
     // Trending Now: fiction
-    // Popular Fiction: science
+    // Popular Fiction: fiction (separate query from Trending)
+    // Science & Technology: science (+ technology top-up)
     // History & Biography: history (+ biography top-up)
-    const fetchTrendingFromFiction = axios({
+
+    const fetchTrendingFiction = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
       params: { subject: 'fiction', limit: 12 },
@@ -39,14 +40,37 @@ export default function Trending() {
       signal: ctrl.signal,
     }).then(r => (r.data?.docs || []).map(normalizeDoc)).catch(() => [])
 
-    const fetchFictionFromScience = axios({
+    const fetchPopularFiction = axios({
+      url: `${OL_ROOT}/search.json`,
+      method: 'GET',
+      params: { subject: 'fiction', limit: 12 },
+      headers: { Accept: 'application/json' },
+      paramsSerializer: (p) => qsSerialize(p),
+      signal: ctrl.signal,
+    }).then(r => (r.data?.docs || []).map(normalizeDoc)).catch(() => [])
+
+    const fetchScienceTech = axios({
       url: `${OL_ROOT}/search.json`,
       method: 'GET',
       params: { subject: 'science', limit: 12 },
       headers: { Accept: 'application/json' },
       paramsSerializer: (p) => qsSerialize(p),
       signal: ctrl.signal,
-    }).then(r => (r.data?.docs || []).map(normalizeDoc)).catch(() => [])
+    })
+    .then(async (r) => {
+      const sci = (r.data?.docs || []).map(normalizeDoc)
+      if (sci.length >= 6) return sci
+      const tech = await axios({
+        url: `${OL_ROOT}/search.json`,
+        method: 'GET',
+        params: { subject: 'technology', limit: 12 },
+        headers: { Accept: 'application/json' },
+        paramsSerializer: (p) => qsSerialize(p),
+        signal: ctrl.signal,
+      }).then(r2 => (r2.data?.docs || []).map(normalizeDoc)).catch(() => [])
+      return [...sci, ...tech].slice(0, 12)
+    })
+    .catch(() => [])
 
     const fetchHistBio = axios({
       url: `${OL_ROOT}/search.json`,
@@ -71,15 +95,16 @@ export default function Trending() {
     })
     .catch(() => [])
 
-    Promise.allSettled([fetchTrendingFromFiction, fetchFictionFromScience, fetchHistBio]).then(([tr, fi, hi]) => {
+    Promise.allSettled([fetchTrendingFiction, fetchPopularFiction, fetchScienceTech, fetchHistBio]).then(([tr, pf, sc, hi]) => {
       if (!live) return
       const toList = (res) => res.status === 'fulfilled' ? (res.value || []) : []
       const next = {
         trending: toList(tr),
-        fiction: toList(fi),
+        fiction: toList(pf),
+        science: toList(sc),
         histbio: toList(hi),
       }
-      const total = next.trending.length + next.fiction.length + next.histbio.length
+      const total = next.trending.length + next.fiction.length + next.science.length + next.histbio.length
       if (total === 0) setErrorMessage('Failed to reach the books service. Showing placeholders.')
       setData(next)
       setIsLoading(false)
@@ -110,6 +135,9 @@ export default function Trending() {
           <Divider sx={{ my: 3 }} />
 
           <Section title="Popular Fiction" books={data.fiction} onOpen={open} />
+          <Divider sx={{ my: 3 }} />
+
+          <Section title="Science & Technology" books={data.science} onOpen={open} />
           <Divider sx={{ my: 3 }} />
 
           <Section title="History & Biography" books={data.histbio} onOpen={open} />

@@ -104,7 +104,6 @@ export default function Browse() {
 
   return (
     <Box sx={{ p: 0 }}>
-      {/* HERO (centered) BEFORE SEARCH */}
       {status === 'idle' && (
         <Box
           sx={{
@@ -124,17 +123,16 @@ export default function Browse() {
         </Box>
       )}
 
-      {/* FIXED SEARCH BAR (always visible) AFTER SEARCH */}
       {status !== 'idle' && (
         <>
           <Box
             ref={barRef}
             sx={(theme) => ({
               position: 'fixed',
-              top: `${toolbarMinH}px`,         // under the AppBar
+              top: `${toolbarMinH}px`,        
               left: 0,
               right: 0,
-              zIndex: theme.zIndex.appBar - 1, // below AppBar
+              zIndex: theme.zIndex.appBar - 1, 
               marginTop: 1,
               bgcolor: 'background.default',
               borderBottom: '1px solid',
@@ -145,10 +143,8 @@ export default function Browse() {
             <Box sx={containerSx}>{SearchRow}</Box>
           </Box>
 
-          {/* Reserve space for fixed bar + extra vertical gap */}
           <Box sx={{ height: `calc(${barH}px + 16px)` }} />
 
-          {/* INFO / ERROR BARS (match search width via shared container) */}
           {status === 'empty' && (
             <Box sx={{ ...containerSx, mb: 2 }}>
               <Alert severity="info" variant="outlined" sx={{ alignItems: 'center' }}>
@@ -167,7 +163,6 @@ export default function Browse() {
         </>
       )}
 
-      {/* RESULTS */}
       {status === 'loading' && <LoadingGrid count={12} />}
       {status === 'done' && (
         <Grid container spacing={2} sx={{ mt: 0, justifyContent: 'center' }}>
